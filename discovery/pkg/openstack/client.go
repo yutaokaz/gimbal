@@ -72,6 +72,9 @@ func (c LoadBalancerV2Client) ListLoadBalancers(projectID string) ([]loadbalance
 	if err != nil {
 		return nil, fmt.Errorf("failed to extract load balancers: %v", err)
 	}
+	if len(lbs) == 0 {
+		return lbs, nil
+	}
 
 	lisPage, err := listeners.List(c.client, listeners.ListOpts{TenantID: projectID}).AllPages()
 	if err != nil {

@@ -130,12 +130,15 @@ func (r *Reconciler) reconcile() {
 		totalUpstreamServices := len(loadbalancers)
 		totalInvalidServices := totalUpstreamServices - len(loadbalancers)
 
-		// Get all pools defined in the project
-		pools, err := r.ListPools(project.ID)
-		if err != nil {
-			r.Metrics.GenericMetricError("ListPools")
-			log.Errorf("error reconciling project %q: %v", projectName, err)
-			continue
+		// Get all pools defined in the project if load balancers are defined.
+		pools := []pools.Pool{}
+		if totalUpstreamServices > 0 {
+			pools, err = r.ListPools(project.ID)
+			if err != nil {
+				r.Metrics.GenericMetricError("ListPools")
+				log.Errorf("error reconciling project %q: %v", projectName, err)
+				continue
+			}
 		}
 
 		// Get all services and endpoints that exist in the corresponding namespace
